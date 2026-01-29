@@ -1,2 +1,4 @@
 # Sunflower_Broomrape
-GWAS analysis for broomrape resistance in sunflower using SNPs and k-mers
+This repository contains all data, code, and analyses for the manuscript:
+
+**"Genome-wide association mapping with SNPs and k-mers identifies introgressed resistance loci to *Orobanche cumana* in sunflower"**
