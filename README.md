@@ -1,4 +1,4 @@
 # Sunflower_Broomrape
 This repository contains all data, code, and analyses for the manuscript:
 
-**"Genome-wide association mapping with SNPs and k-mers identifies introgressed resistance loci to *Orobanche cumana* in sunflower"**
+**"Wild genes to the rescue: High-throughput genomics reveals the wild source of broomrape resistance in sunflower"**
