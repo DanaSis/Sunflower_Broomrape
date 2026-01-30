@@ -21,16 +21,19 @@ kmer_table=/mnt/data/sunflower/sunflowerKmer/kmers_table
 
 cp /mnt/data/DanaS/gwas_remappedHa412/pheno/pheno_030822.txt /mnt/data/DanaS/kmer/pheno # copy the original
 
-awk 'BEGIN{FS=OFS="\t"; print "accession_id", "phenotype_value"} NR>1{print $1, $2}' pheno_030822.txt > HEAL.mean_total_area.txt # create a new onw with the wanted colunms and col names:
+awk 'BEGIN{FS=OFS="\t"; print "accession_id", "phenotype_value"} NR>1{print $1, $2}' pheno.txt > pheno_for_kmer.txt # create a new onw with the wanted colunms and col names:
 
 # or, can do the same with awk + sed: (but the previos one is one line and more elegant)
-awk '{ print $1,  $2 }' pheno_030822.txt > HEALTHY__ppn.mean_total_area.txt # create a new one with the first and second col
-sed '1{ s/PPN/accession_id/; s/HEALTHY__ppn.mean_total_area_norm2root/phenotype_value/; }' HEALTHY__ppn.mean_total_area.txt # chnge the headers
+awk '{ print $1,  $2 }' pheno.txt > pheno_for_kmer.txt # create a new one with the first and second col
+sed '1{ s/accesion/accession_id/; s/n_HEL/phenotype_value/; }' pheno_for_kmer.txt # chnge the headers
 
 ######################################################## Run k-mers-based GWAS ##########################################################
 
 python2.7 <KMERS-GWAS-PATH>/kmers_gwas.py --pheno phenotype.pheno --kmers_table kmers_table -l 31 -p 8 --outdir output_dir
 
+wc -l /mnt/data/DanaS/kmer/broomrape/kmers/pass_threshold_5per /mnt/data/DanaS/kmer/broomrape/kmers/pass_threshold_10per
+
+# python2.7 /mnt/data/sunflower/sunflowerKmer/kmers_gwas.py --help
 #Parameters used:
 # --pheno - a file with numerical phenotypic information (format
 # described in “k-mers table conversion to PLINK binary format“
@@ -41,30 +44,6 @@ python2.7 <KMERS-GWAS-PATH>/kmers_gwas.py --pheno phenotype.pheno --kmers_table 
 # --outdir - path to a directory for output
 # -k, --kmers_number - number of k-mers to filter from first step (defualt is 10001)
 
-# kmers_gwas.py path:
-/mnt/data/sunflower/sunflowerKmer/kmers_gwas.py
-# pheno.txt path
-/mnt/data/DanaS/kmer/phenot/HEAL.mean_total_area.txt
-# k-mer table path:
-/mnt/data/sunflower/sunflowerKmer/kmers_table
-# path to a directory for output (dont use an existing dir i.e it will crearte a dir "broomrape" for the output)
-/mnt/data/DanaS/kmer/broomrape
-
-python2.7 /mnt/data/sunflower/sunflowerKmer/kmers_gwas.py --pheno /mnt/data/DanaS/kmer/phenot/HEAL.mean_total_area.txt --kmers_table /mnt/data/sunflower/sunflowerKmer/kmers_table -l 31 -p 20 --kmers_number 100001 --outdir /mnt/data/DanaS/kmer/kmer_large
-
-#in the output dir, in phenotype_value.assoc.txt.gz there are all the 10001 kmers with their p_val. to see the first few:
-gzip -cd /mnt/data/DanaS/kmer/broomrape/kmers/output/phenotype_value.assoc.txt.gz | head
-
-# to see how many k-mer passed the 5 and 10% threshold:
-wc -l <file>
-wc -l /mnt/data/DanaS/kmer/broomrape/kmers/pass_threshold_5per /mnt/data/DanaS/kmer/broomrape/kmers/pass_threshold_10per
-
-#for same analysis without permutation use the flag 
---kmers_for_no_perm_phenotype
-
-#see all parameters at:
-python2.7 /mnt/data/sunflower/sunflowerKmer/kmers_gwas.py --help
-
 #Regarding positioning the k-mers, there is no one way to do this. You can look at the examples in our paper, where we tried 
 #different things. To summarise I would say, first option is to map k-mers, second would be to find the reads from which the k-mer 
 #of interest originated and map the reads, and finally if the previous two didn't work, you can assemble all reads which are linked 
@@ -74,17 +53,12 @@ python2.7 /mnt/data/sunflower/sunflowerKmer/kmers_gwas.py --help
 
 # use filter_table for textual output of k-mers presence/absence pattern. this will output a .txt file with all accessions and 
 # presence/absence 1/0
-filter_kmers -t kmers_table -k kmers_list.txt -o output.txt
+#filter_kmers -t kmers_table -k kmers_list.txt -o output.txt
 
-Parameters used:
--t - k-mers table prefix path
--k - file with k-mers, each k-mer in a seperate line
--o - output file
-
-
-/mnt/data/sunflower/sunflowerKmer/bin/filter_kmers -t /mnt/data/sunflower/sunflowerKmer/kmers_table -k /mnt/data/DanaS/kmer/broomrape/kmers/pass_threshold_10per_kmers_list_no_under_no_header.txt -o 10per_kmers_list_from_table.txt
-kmer_list=../get_kmers/kmers_list.txt
-/mnt/data/sunflower/sunflowerKmer/bin/filter_kmers -t /mnt/data/sunflower/sunflowerKmer/kmers_table -k $kmer_list -o pav_table.txt
+#Parameters used:
+#-t - k-mers table prefix path
+#-k - file with k-mers, each k-mer in a seperate line
+#-o - output file
 
 ## process the kmer file (pass_threshold_10per) for alignment:
 
