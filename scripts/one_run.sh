@@ -1,83 +1,14 @@
-vcftools --gzvcf /mnt/data/sunflower/SAM_SNPs/Annuus.tranche90.snp.fullsam.90.bi.remappedHa412HO.vcf.gz --maf 0.05 --max-missing 0.8 --recode --recode-INFO-all --out SAM.noIndels
 
-bcftools index file.vcf.gz
-
-conda activate r_4.1
-pop=yavor
-pop=gadot
-cd /mnt/data/DanaS/may_2024/$pop
-cd /mnt/data/DanaS/may_2024/$pop/zero_one/by_n2r/
-mkdir -p ./mean/{thresh_01,thresh_025,thresh_05,thresh_075,thresh_085} ./max/{thresh_01,thresh_025,thresh_05,thresh_075,thresh_085}
-cd /mnt/data/DanaS/may_2024/$pop/zero_one/by_n/
-mkdir -p ./mean/{thresh_5,thresh_10,thresh_15,thresh_17,thresh_20,thresh_25} ./max/{thresh_5,thresh_10,thresh_15,thresh_17,thresh_20,thresh_25}
-mkdir -p ./NEC/{thresh_005,thresh_01,thresh_015,thresh_02,thresh_025}
-mkdir -p ./{thresh_001,thresh_002,thresh_003,thresh_004,thresh_005}
-cp /mnt/data/DanaS/may_2024/yavor/by_n2r/max/NEC/means_max_nec_yavor_n2r.txt ./
-
-PRE=
-screen -S "$PRE"
-
-FULL_PHENO=/mnt/data/DanaS/may_2024/gadot/pheno_means_gadot.txt
-FULL_PHENO=/mnt/data/DanaS/may_2024/yavor/pheno_means.txt
-awk 'BEGIN {OFS="\t"} {print $1, $20, $22, $23, $25}' $FULL_PHENO > ./PHENO_FOR_FILTER_NEC.txt
-PHENO_FOR_FILTER=/mnt/data/DanaS/may_2024/gadot/by_n2r/mean/NEC/PHENO_FOR_FILTER_NEC.txt # 
-PHENO_FOR_FILTER=/mnt/data/DanaS/may_2024/yavor/by_n2r/mean/NEC/means_max_nec_yavor_n2r.txt
-PHENO_FOR_FILTER=/mnt/data/DanaS/may_2024/yavor/means_max_healthy_yavor.txt
-Rscript /mnt/data/DanaS/may_2024/gadot/filter_pheno.r $PHENO_FOR_FILTER
-
-cd /mnt/data/DanaS/may_2024/gadot/by_n2r
-# Rscript /mnt/data/DanaS/may_2024/gadot/filter_pheno.r /mnt/data/DanaS/may_2024/gadot/pheno_means_gadot.txt
-
-cp /mnt/data/DanaS/zero_one/snakefile /mnt/data/DanaS/may_2024/gadot/zero_one/by_n/max/thresh_5
-
-PRE=aeg_HEALTHY_mean_thresh_001
-screen -S "$PRE"
-PRE=yavor_HEALTHY_mean_thresh_5
-PHENO=/mnt/data/DanaS/may_2024/yavor/by_n/mean/thresh_5/filtered_by_n_HEALTHY_mean_thresh_5.txt
-OUTDIR=/mnt/data/DanaS/may_2024/yavor/by_n/mean/thresh_5/
-VCF=/mnt/data/sunflower/SNP_HA412/SAM.HA412.maf5Miss20Tranch99.vcf.gz
-cd $OUTDIR
-awk 'BEGIN {OFS="\t"} {print $1, $4, $5, $8, $9}' $PHENO > PHENO_FOR_GWAS.txt
-PHENO=./PHENO_FOR_GWAS.txt
-############################################# 03 filter try ##############################
+############################################# filter  ##############################
 PHENO=/mnt/data/DanaS/may_2024/yavor/by_n2r/mean/thresh_05/filtered_by_n2r_HEALTHY_mean_thresh_0.5.txt
 OUTDIR=/mnt/data/DanaS/may_2024/yavor/by_n2r/mean/thresh_05/xrq
 VCF=/mnt/data/sunflower/SAM_SNPs/Annuus.tranche90.snp.fullsam.90.bi.remappedxrqv2.vcf.gz
 PRE=yavor_HEL_mean_thresh05
-#########################################################################################
-############################################# no filter try ##############################
-PHENO=aeg_summary_all.txt
-awk 'BEGIN {OFS="\t"} {print $1, $12, $13, $14, $15, $28, $29, $30, $31}' $PHENO > PHENO.txt
-awk 'BEGIN {OFS="\t"} {print $1, $4, $5, $8, $9, $20, $21, $30, $24 , $25}' $PHENO > PHENO2.txt
-PHENO=/mnt/data/DanaS/sam_broom_gwas/gwas/aeg/zero_one/aeg_zro_one_by_n_HEALTHY_n2r_mean.txt
-OUTDIR=/mnt/data/DanaS/sam_broom_gwas/gwas/aeg
-VCF=/mnt/data/sunflower/SNP_HA412/SAM.HA412.maf5Miss20Tranch99.vcf.gz
-PRE=aeg_zer_ove
-#########################################################################################
-############################################# thresh05_less1 try ##############################
-PHENO=/mnt/data/DanaS/may_2024/gadot/by_n2r/mean/thresh05_less1/n_HEALTHY_n2r_mean_thresh05_less1.txt
-OUTDIR=/mnt/data/DanaS/may_2024/gadot/by_n2r/mean/thresh05_less1
-VCF=/mnt/data/sunflower/SNP_HA412/SAM.HA412.maf5Miss20Tranch99.vcf.gz
-PRE=thresh05_less1
-#########################################################################################
-#########################################################################################
-############################################ aeg try ##############################
-cd /mnt/data/DanaS/sam_broom_gwas/gwas/aeg/thresh/nec/mean
-
-PHENO=/mnt/data/DanaS/sam_broom_gwas/gwas/aeg/thresh/nec/mean/thresh_005/filtered_by_n_NEC_mean_thresh_0.05.txt
-OUTDIR=/mnt/data/DanaS/sam_broom_gwas/gwas/aeg/thresh/nec/mean/thresh_005
-VCF=/mnt/data/sunflower/SNP_HA412/SAM.HA412.maf5Miss20Tranch99.vcf.gz
-PRE=aeg_NEC_mean_thresh_005
-#########################################################################################
-
-
-
-dos2unix $PHENO
-dos2unix /mnt/data/DanaS/may_2024/yavor/by_n2r/mean/thresh_05/filter_by_total/*.txt
+#####################################################################################
 
 
 conda deactivate
-trsh=0.5
+thrsh=0.5
 threshfldr=thresh_05
 
 PHENO=/mnt/data/DanaS/may_2024/yavor/by_n2r/mean/thresh_05/filter_by_total/$threshfldr/total_tubes_n2r_mean_yavor_"$trsh".txt
@@ -190,17 +121,10 @@ done
 mkdir plots
 mv *.jpeg ./plots
 conda deactivate
-screen -d
-screen -ls
-screen -X -S 2798816.yavor_HEALTHY_mean_thresh_17 quit 
 
-Rscript /mnt/data/DanaS/r_scripts/Plot.Manhattan.QQ.R ./out_gemma/preplot/$trait.assoc.txt $trait $bonfer $simple
-screen -S gadot_mean_thresh5
-screen -r 1580344.gadot_max_thresh025
-gemma -bfile $PRE -k $relat -lmm 4 -n 7 -o Total_tubes_mean_zero_one -outdir $OUTGEMMA
 
 # to skip the first 10 lines and then use while read -r :
-tail -n +12 TraitMap.txt | while read -r col trait 
+while read -r col trait 
 do
     gemma -bfile "$PRE" \
     -k $relat \
@@ -209,70 +133,12 @@ do
     -outdir $OUTGEMMA
 done
 
-
-
-ls  ./out_gemma/preplot | wc -l
-
-
-sort -k13,13nr $cp | awk 'NR<=20 {print $13}'
-cp=/mnt/data/DanaS/associations/gemma/stg/lmm/gemma_out/preplot/total_area_NEC_stage_5_mean_norm2root.assoc.txt
-cp=./out_gemma/n_HEALTHY_mean_zero_one.assoc.txt
-awk '{print $13}' ./out_gemma/N_HEALTHY_emmean_mix.assoc.txt | sort -nr | head -20
-# see lowest (highest -log) pvals
-awk '{print -$13/log(10)}' ./out_gemma/n_HEALTHY_mean.assoc.txt | sort -n | tail -n 20
-awk '{print $13}' ./out_gemma/N_HEALTHY_emmean_mix.assoc.txt | sort -n | head -20
-awk '{print $1, $2, $13}' $cp | sort -n | tail -n 20 | awk '{print -log($13)/log(10)}'
-awk -F"\t" '{a = -log($13)/log(10); printf("%0.4f\n", a)}' ./out_gemma/area_HEALTHY_max.assoc.txt
-
-awk '{print $13,$2}' $cp | grep Chr16 | grep e-04 | sort -n | tail -n 20 
-grep e-04 $cp
-cp=/mnt/data/DanaS/zero_one/gadot/out_gemma/area_HEALTHY_max.assoc.txt
-awk '{print $1, $13}' $cp | grep Ha412HOChr17 | sort -nr | tail
-awk '{print $1, $13}' $cp | grep '17' | sort -n -k2,2 | tail
-
-
-awk '{print $1=='17', $13}' $cp  > chr17
-
-awk '$1 ~ /^17/ && NR==1 || $1 ~ /^17/ && $13 < min {min = $13} END {print min}' $cp
-
-awk '($13<$simple) {print $1}' input.txt
-
-screen -ls
-screen -d 1738690.NAME
-screen -S 1720015.NAME -X quit
-OUTGEMMA=/mnt/data/DanaS/may_2024/gadot/zero_one/no_filter/out_gemma
-mkdir $OUTGEMMA/preplot
-cp ./out_gemma/*.assoc.txt ./out_gemma/preplot/
-
-bcftools query -f '%CHROM\n' $vcf_id | sort -u | head # see the chr names
-
-cut -f1 ./out_gemma/n_HEALTHY_max.assoc.txt | sort | uniq
-
 #to remove chrachters (Ha412HOChr/HanXRQChr) from CHR col so it will be numeric - FOR ALL THE FILES IN THE DIRECTORY
 # if chr col has boath HanXRQChr and HanXRQChr00c do this:
 mkdir ./out_gemma/preplot
 for file in ./out_gemma/preplot/*.assoc.txt; do
     sed -i '/^HanXRQChr00c/d' "$file"
     sed -i 's/^HanXRQChr//g' "$file"
-done
-
-# if only HanXRQChr than do this 
-sed -i 's/^Ha412HOChr//g' ./out_gemma/preplot/*.assoc.txt #for Ha412 
-sed -i 's/^HanXRQChr//g' ./out_gemma/preplot/*.assoc.txt #for XRQ
-
-sed -i 's/^Ha412HOChr//g' ./out_gemma/n_N_max.assoc.txt
-# _____to do the above in one chunck: ______
-# Process *.assoc.txt files
-for file in ./out_gemma/preplot/*.assoc.txt; do
-    # Check if file contains 'HanXRQChr00c'
-    if grep -q 'HanXRQChr00c' "$file"; then
-        # If 'HanXRQChr00c' is present, delete lines starting with it and remove 'HanXRQChr' from the start of lines
-        sed -i '/^HanXRQChr00c/d' "$file"
-        sed -i 's/^HanXRQChr//g' "$file"
-    else
-        # If 'HanXRQChr00c' is not present, just remove 'HanXRQChr' from the start of lines
-        sed -i 's/^HanXRQChr//g' "$file"
-    fi
 done
 
 #________________________________________________________
@@ -353,12 +219,8 @@ screen -ls
 
 
 
-gwas_file=/mnt/data/DanaS/zero_one/gadot/z_25/out_gemma/preplot/n_HEALTHY_mean_zero_one.assoc.txt
-head $gwas_file
-#!/bin/bash
-
 # Variables
-gwas_file="gwas_results.txt"
+gwas_file=/mnt/data/DanaS/zero_one/gadot/out_gemma/n_HEALTHY_mean_zero_one.assoc.txt
 chromosome="13"
 num_results=10
 
